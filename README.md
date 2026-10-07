@@ -1,10 +1,21 @@
-# NEXO-9 · Protocolo Traidor
+# NEXO-9 · Protocolo Traidor — REMASTERED
 
 Juego de deducción social para navegador. Una estación minera, una tripulación de robots y uno o más traidores entre ellos.
 
 **[▶ Jugar ahora](https://ossama450298-commits.github.io/Nexo9/)** · Funciona en ordenador, portátil y tablet. No hace falta instalar nada.
 
 ![Partida](capturas/partida.png)
+
+## Novedades de REMASTERED
+
+Remasterización visual completa con la misma jugabilidad de siempre:
+
+- **Mapa con volumen:** paredes biseladas con remaches, tuberías, monitores y franjas de peligro; suelos con textura, manchas y cables; luz empotrada en los pasillos.
+- **Iluminación cinematográfica:** conos de luz bajo cada foco y un tono distinto según la situación (frío industrial, apagón con balizas, emergencia en rojo, comunicaciones caídas).
+- **Personajes más vivos:** se inclinan al caminar, levantan polvo, llevan hombreras y un reflejo que recorre la visera.
+- **Interfaz nueva:** paneles de cristal, botones con estados claros, HUD con barra segmentada, reuniones con temporizador en anillo, cámaras con visor de vigilancia y mapa táctico con barrido.
+- **Momentos clave:** expulsión con planeta y estela, y finales con destellos de victoria o brasas de derrota.
+- **Más rápido que antes:** la iluminación va grabada en el mapa, así que cada fotograma se dibuja más deprisa que en la versión anterior.
 
 ## Cómo jugar
 
