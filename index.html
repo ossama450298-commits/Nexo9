@@ -648,6 +648,31 @@ input[type=range] { accent-color: var(--ambar); width: 100%; }
 @keyframes rm-grain { 0% { transform: translate(0, 0); } 20% { transform: translate(-6%, 3%); } 40% { transform: translate(4%, -5%); } 60% { transform: translate(-3%, 6%); } 80% { transform: translate(5%, 2%); } }
 @media (prefers-reduced-motion: reduce) { #film-grain { animation: none; } }
 
+/* ---------- Menú de pausa (Esc) ---------- */
+.pause { z-index: 60; display: flex; align-items: center; justify-content: center; padding: 16px; background: radial-gradient(circle at 50% 40%, rgba(20, 26, 48, .55), rgba(4, 5, 12, .82)); backdrop-filter: blur(6px) saturate(.8); animation: rm-fade .2s; }
+.pause-panel { width: min(460px, 100%); max-height: 100%; overflow-y: auto; padding: 26px 26px 22px !important; animation: rm-mt-in .35s cubic-bezier(.2, 1.2, .3, 1); }
+.pause-head { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--edge); }
+.pause-head h2 { margin: 0; font: 700 2rem/1 var(--display); text-transform: uppercase; letter-spacing: .12em; text-shadow: 0 0 22px rgba(255, 182, 39, .35); }
+.pause-head h2::after { content: ''; display: block; width: 64px; height: 6px; margin-top: 10px; background: repeating-linear-gradient(-45deg, var(--ambar) 0 8px, #1a1406 8px 16px); }
+.pause-head .hint { margin: 10px 0 0; }
+.pause-view { display: flex; flex-direction: column; gap: 9px; }
+.pause-view h3 { margin: 0 0 6px; text-transform: uppercase; letter-spacing: .08em; }
+.pause-view .row { margin-top: 10px; }
+#pm-main .mbtn { animation: rm-slide .35s both; }
+#pm-main .mbtn:nth-child(2) { animation-delay: .04s; } #pm-main .mbtn:nth-child(3) { animation-delay: .08s; }
+#pm-main .mbtn:nth-child(4) { animation-delay: .12s; } #pm-main .mbtn:nth-child(5) { animation-delay: .16s; }
+.pause-view:not(#pm-main):not([hidden]) { animation: rm-fade .25s; }
+.mbtn.danger:hover, .mbtn.danger:focus-visible { box-shadow: 0 0 0 1px rgba(255, 90, 95, .6), 0 10px 30px rgba(0, 0, 0, .35) !important; color: #ff9a9d; }
+.mbtn.danger::before { background: rgba(255, 90, 95, .5) !important; }
+.btn.danger { background: linear-gradient(180deg, #ff7377, #d93a40) !important; color: #fff !important; box-shadow: 0 0 22px rgba(255, 90, 95, .35); }
+.pause .vol { grid-template-columns: 130px 1fr 36px; }
+.pause .keys { font-size: .9rem; }
+body.paused #hud, body.paused #game { filter: saturate(.55) brightness(.75); }
+
+/* La capa de flechas de conductos ocupa toda la pantalla: no debe bloquear los clics del HUD */
+#hud > #vent-arrows { pointer-events: none; }
+#hud > #vent-arrows button { pointer-events: auto; }
+
 .lobby-title { font: 700 clamp(1.8rem, 5vw, 2.6rem)/1 var(--display); color: var(--tinta); margin: 0; padding-bottom: 10px; border-bottom: 6px solid; border-image: repeating-linear-gradient(-45deg, var(--ambar) 0 10px, #1a1406 10px 20px) 6; }
 .bot-box { display: flex; gap: 18px; flex-wrap: wrap; align-items: flex-end; }
 .bot-ctl { display: flex; flex-direction: column; gap: 4px; color: var(--apagado); font-size: .85rem; min-width: 150px; }
@@ -827,7 +852,7 @@ input[type=range] { accent-color: var(--ambar); width: 100%; }
       <div class="hud-icons">
         <button class="icon-btn" id="btn-map" title="Mapa (M)">Mapa</button>
         <button class="icon-btn" id="btn-ghostchat" title="Chat de fantasmas" hidden>Chat</button>
-        <button class="icon-btn" id="btn-opts" title="Sonido">Sonido</button>
+        <button class="icon-btn" id="btn-opts" title="Menú (Esc)">Menú</button>
       </div>
     </div>
     <div id="actions" class="actions">
@@ -936,6 +961,55 @@ input[type=range] { accent-color: var(--ambar); width: 100%; }
       <div class="cams-grid">
         <canvas class="cam" width="448" height="288"></canvas><canvas class="cam" width="448" height="288"></canvas>
         <canvas class="cam" width="448" height="288"></canvas><canvas class="cam" width="448" height="288"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div id="pause-menu" class="overlay pause" hidden>
+    <div class="pause-panel panel" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+      <header class="pause-head">
+        <h2 id="pause-title">Pausa</h2>
+        <p id="pause-note" class="hint"></p>
+      </header>
+      <div id="pm-main" class="pause-view">
+        <button class="mbtn primary" id="pm-resume">REANUDAR<small>Volver a la partida · Esc</small></button>
+        <button class="mbtn" data-pm="audio">AUDIO<small>Volumen general, efectos y música</small></button>
+        <button class="mbtn" data-pm="options">OPCIONES<small>Escenas y preferencias</small></button>
+        <button class="mbtn" data-pm="controls">CONTROLES<small>Teclas del juego</small></button>
+        <button class="mbtn danger" data-pm="quit">SALIR DE LA PARTIDA<small>Volver al menú principal</small></button>
+      </div>
+      <div id="pm-audio" class="pause-view" hidden>
+        <h3>Audio</h3>
+        <div class="vol"><span>Volumen general</span><input type="range" data-pvol="master" min="0" max="1" step="0.05"><output></output></div>
+        <div class="vol"><span>Efectos</span><input type="range" data-pvol="sfx" min="0" max="1" step="0.05"><output></output></div>
+        <div class="vol"><span>Música</span><input type="range" data-pvol="music" min="0" max="1" step="0.05"><output></output></div>
+        <label class="check"><input type="checkbox" id="pm-music"> Reproducir música ambiental</label>
+        <div class="row"><button class="btn" data-pm="main">Volver</button></div>
+      </div>
+      <div id="pm-options" class="pause-view" hidden>
+        <h3>Opciones</h3>
+        <label class="check"><input type="checkbox" id="pm-killcam"> Mostrar la escena cuando eliminas a alguien (impostor)</label>
+        <div class="row"><button class="btn" data-pm="main">Volver</button></div>
+      </div>
+      <div id="pm-controls" class="pause-view" hidden>
+        <h3>Controles</h3>
+        <dl class="keys">
+          <dt>WASD / Flechas</dt><dd>Moverse</dd>
+          <dt>E / Espacio</dt><dd>Usar, tareas, botón de emergencia, cámaras</dd>
+          <dt>R</dt><dd>Reportar cuerpo</dd>
+          <dt>Q</dt><dd>Eliminar (impostor)</dd>
+          <dt>F</dt><dd>Sabotear (impostor)</dd>
+          <dt>V</dt><dd>Conducto (impostor e ingeniero)</dd>
+          <dt>T</dt><dd>Transformarse (cambiaformas)</dd>
+          <dt>M · Tab</dt><dd>Mapa · Lista de tareas</dd>
+          <dt>Esc</dt><dd>Cerrar ventanas · Menú de pausa</dd>
+        </dl>
+        <div class="row"><button class="btn" data-pm="main">Volver</button></div>
+      </div>
+      <div id="pm-quit" class="pause-view" hidden>
+        <h3>¿Salir de la partida?</h3>
+        <p id="pm-quit-text">Perderás el progreso de esta partida y volverás al menú principal.</p>
+        <div class="row"><button class="btn" data-pm="main">Cancelar</button><button class="btn primary danger" id="pm-quit-ok">Salir</button></div>
       </div>
     </div>
   </div>
@@ -1604,7 +1678,7 @@ class Game {
 
   /* ---------- bucle principal ---------- */
   update(dt) {
-    if (this.phase === 'over') return;
+    if (this.phase === 'over' || this.paused) return; // pausa: solo en la versión contra bots
     this.time += dt;
     this.tick++;
 
@@ -2381,8 +2455,10 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
     room = null;
   }
 
+  LS.setPaused = on => { if (room && room.game) room.game.paused = !!on; };
+  LS.canPause = true;
   setInterval(() => {
-    if (!room || !room.game) return;
+    if (!room || !room.game || room.game.paused) return;
     const t = now();
     for (const b of room.bots) { try { b.tick(t); } catch (e) { console.error('[bot]', e); } }
   }, 1000 / 30);
@@ -3356,7 +3432,8 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
   const MOVE = { KeyW: [0, -1], ArrowUp: [0, -1], KeyS: [0, 1], ArrowDown: [0, 1], KeyA: [-1, 0], ArrowLeft: [-1, 0], KeyD: [1, 0], ArrowRight: [1, 0] };
   const I = { keys: new Set(), joy: { x: 0, y: 0, active: false }, listeners: [] };
   I.touch = (window.matchMedia && matchMedia('(pointer: coarse)').matches) || ('ontouchstart' in window && navigator.maxTouchPoints > 0);
-  const typing = e => { const t = e.target; return t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT'); };
+  // Solo cuenta como «escribiendo» un campo de texto real (no deslizadores ni casillas)
+  const typing = e => { const t = e.target; return t && ((t.tagName === 'INPUT' && !['range', 'checkbox', 'radio', 'button'].includes(t.type)) || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT'); };
 
   window.addEventListener('keydown', e => {
     if (typing(e)) { if (e.code === 'Escape') e.target.blur(); return; }
@@ -5692,7 +5769,47 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
   ['master', 'sfx', 'music'].forEach(k => $('vol-' + k).addEventListener('input', e => { A.setVolume(k, Number(e.target.value)); e.target.nextElementSibling.textContent = Math.round(e.target.value * 100); }));
   $('opt-music').addEventListener('change', e => { A.init(); A.setMusic(e.target.checked); });
   document.querySelectorAll('[data-vol]').forEach(i => { i.value = A.vol[i.dataset.vol]; i.addEventListener('input', () => A.setVolume(i.dataset.vol, Number(i.value))); });
-  $('btn-opts').addEventListener('click', () => { $('sound-pop').hidden = !$('sound-pop').hidden; });
+  /* ---------- Menú de pausa (Esc) ---------- */
+  const canPause = () => !!(NX.local && NX.local.canPause);
+  function showPauseView(v) {
+    ['main', 'audio', 'options', 'controls', 'quit'].forEach(n => { $('pm-' + n).hidden = n !== v; });
+    G.pauseView = v;
+    const first = $('pm-' + v).querySelector('button, input');
+    if (first) first.focus({ preventScroll: true });
+  }
+  function openPause() {
+    if (!(G.mode === 'playing' || G.mode === 'meeting') || !$('pause-menu').hidden) return;
+    I.clear();
+    $('pause-menu').hidden = false; document.body.classList.add('paused');
+    G.paused = true; G.pausedAt = performance.now();
+    if (canPause()) NX.local.setPaused(true);
+    $('pause-title').textContent = canPause() ? 'Pausa' : 'Menú';
+    $('pause-note').textContent = canPause() ? 'La partida está detenida: los bots y los temporizadores esperan.' : 'Partida en línea: el juego sigue en marcha para los demás.';
+    $('pm-quit-text').textContent = canPause() ? 'Perderás el progreso de esta partida y volverás al menú principal.' : 'Abandonarás la partida en línea y volverás al menú principal.';
+    document.querySelectorAll('[data-pvol]').forEach(i => { i.value = A.vol[i.dataset.pvol]; i.nextElementSibling.textContent = Math.round(A.vol[i.dataset.pvol] * 100); });
+    $('pm-music').checked = A.musicOn; $('pm-killcam').checked = killCamOn();
+    showPauseView('main'); A.play('click');
+  }
+  function closePause() {
+    if ($('pause-menu').hidden) return;
+    $('pause-menu').hidden = true; document.body.classList.remove('paused');
+    const pausedFor = performance.now() - (G.pausedAt || performance.now());
+    G.paused = false;
+    if (canPause()) {
+      NX.local.setPaused(false);
+      // los temporizadores de la interfaz no deben haber corrido durante la pausa
+      if (UI.mt.endsAt) UI.mt.endsAt += pausedFor;
+    }
+  }
+  NX.pause = { open: openPause, close: closePause };
+  $('btn-opts').addEventListener('click', openPause);
+  $('pm-resume').addEventListener('click', closePause);
+  document.querySelectorAll('[data-pm]').forEach(b => b.addEventListener('click', () => showPauseView(b.dataset.pm)));
+  document.querySelectorAll('[data-pvol]').forEach(i => i.addEventListener('input', () => { A.setVolume(i.dataset.pvol, Number(i.value)); i.nextElementSibling.textContent = Math.round(i.value * 100); }));
+  $('pm-music').addEventListener('change', e => { A.init(); A.setMusic(e.target.checked); });
+  $('pm-killcam').addEventListener('change', e => { try { localStorage.setItem('nx_killcam', e.target.checked ? '1' : '0'); } catch (err) {} $('opt-killcam').checked = e.target.checked; });
+  $('pm-quit-ok').addEventListener('click', () => { closePause(); net.send('leave'); toMenu(); });
+  $('pause-menu').addEventListener('pointerdown', e => { if (e.target.id === 'pause-menu') closePause(); });
   $('leave-game').addEventListener('click', () => { if (confirm('¿Abandonar la partida?')) { net.send('leave'); toMenu(); } });
 
   /* ================= LOBBY ================= */
@@ -5708,6 +5825,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
 
   function renderLobby() { if (G.room) UI.renderLobby(G.room, G.myId, color => net.send('color', { color })); }
   function toMenu() {
+    closePause();
     closeAllOverlays();
     G.mode = 'menu'; G.room = null;
     $('hud').hidden = true; UI.mt.close(); UI.hideEject();
@@ -5880,6 +5998,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
     $('ghost-drawer').hidden = true;
   });
   net.on('gameOver', m => {
+    closePause();
     G.mode = 'over';
     closeAllOverlays();
     $('hud').hidden = true;
@@ -5945,7 +6064,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
     return MAP.move(map, x, y, dx * sp, dy * sp, C.PLAYER_RADIUS, !G.me.alive);
   }
   function canMove() {
-    return G.mode === 'playing' && !G.revealing && !(G.killAnimUntil > performance.now()) && !TK.current && !G.me.vent && !G.camsOpen && G.reactorPoint < 0 && document.activeElement !== $('chat-input');
+    return G.mode === 'playing' && !G.paused && !G.revealing && !(G.killAnimUntil > performance.now()) && !TK.current && !G.me.vent && !G.camsOpen && G.reactorPoint < 0 && document.activeElement !== $('chat-input');
   }
   const d2 = (ax, ay, bx, by) => Math.hypot(ax - bx, ay - by);
 
@@ -6051,7 +6170,13 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
       return;
     }
     if (G.mode === 'meeting' && code === 'Enter') { $('chat-input').focus(); return; }
-    if (code === 'Escape') { if (TK.current) TK.close(true); closeMap(); closeCams(true); closeReactor(); $('sound-pop').hidden = true; $('ghost-drawer').hidden = true; return; }
+    if (code === 'Escape') {
+      if (!$('pause-menu').hidden) { if (G.pauseView && G.pauseView !== 'main') showPauseView('main'); else closePause(); return; }
+      const anyOpen = TK.current || !$('map-overlay').hidden || G.camsOpen || G.reactorPoint >= 0 || !$('shift-modal').hidden || !$('ghost-drawer').hidden || !$('sound-pop').hidden;
+      if (anyOpen) { if (TK.current) TK.close(true); closeMap(); closeCams(true); closeReactor(); closeShift(); $('sound-pop').hidden = true; $('ghost-drawer').hidden = true; return; }
+      openPause(); return;
+    }
+    if (!$('pause-menu').hidden) return; // con el menú abierto no se aceptan acciones
     if (G.mode !== 'playing' || G.revealing) return;
     if (code === 'KeyM') { $('map-overlay').hidden ? openMap(false) : closeMap(); return; }
     if (code === 'Tab') { $('task-panel').classList.toggle('collapsed'); return; }
@@ -6225,7 +6350,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
       if (G.acc > C.STEP * 5) G.acc = 0;
       if (G.pending.length > 120) G.pending.splice(0, G.pending.length - 120);
       if (G.me.moving && G.me.alive) { G.stepT -= dt; if (G.stepT <= 0) { G.stepT = 0.28; A.play('step'); } }
-      if (G.sab) { G.alarmT -= dt; if (G.alarmT <= 0) { G.alarmT = G.sab.k === 'reactor' ? 0.9 : 2.4; A.play('alarm'); } }
+      if (G.sab && !G.paused) { G.alarmT -= dt; if (G.alarmT <= 0) { G.alarmT = G.sab.k === 'reactor' ? 0.9 : 2.4; A.play('alarm'); } }
       computeInteractions();
       R.frame(G, dt);
       updateHud();

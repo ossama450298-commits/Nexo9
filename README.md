@@ -61,7 +61,8 @@ Si eres **tripulante**, completa tus tareas y descubre a los impostores. Si eres
 | F | Sabotear (impostor) |
 | V | Conducto (impostor e ingeniero) |
 | T | Transformarse (cambiaformas) |
-| M · Tab · Esc | Mapa · Lista de tareas · Cerrar ventanas |
+| M · Tab | Mapa · Lista de tareas |
+| Esc | Cierra ventanas o abre el **menú de pausa** (reanudar, audio, opciones, controles y salir). Contra bots, la partida se detiene. |
 
 En pantallas táctiles aparece un joystick y los botones se pulsan con el dedo.
 
