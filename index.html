@@ -724,6 +724,7 @@ input[type=range] { accent-color: var(--ambar); width: 100%; }
         <div class="vol"><span>Efectos</span><input type="range" id="vol-sfx" min="0" max="1" step="0.05"><output></output></div>
         <div class="vol"><span>Música ambiental</span><input type="range" id="vol-music" min="0" max="1" step="0.05"><output></output></div>
         <label class="check"><input type="checkbox" id="opt-music"> Reproducir música ambiental</label>
+        <label class="check"><input type="checkbox" id="opt-killcam"> Mostrar la escena cuando eliminas a alguien (impostor)</label>
         <h3>Controles</h3>
         <dl class="keys">
           <dt>WASD / Flechas</dt><dd>Moverse</dd>
@@ -1797,7 +1798,9 @@ class Game {
     // La víctima ve el aspecto de quien la elimina (disfraz incluido). Los fantasmas no hablan con los vivos.
     this.send(t, { t: 'killed', by: p.look || p.id });
     for (const o of this.players.values()) {
-      if (o !== t && this.sees(o, body.x, body.y)) this.send(o, { t: 'killFx', x: r0(body.x), y: r0(body.y), mine: o === p ? 1 : 0 });
+      if (o !== t && this.sees(o, body.x, body.y)) this.send(o, o === p
+        ? { t: 'killFx', x: r0(body.x), y: r0(body.y), mine: 1, vc: body.color } // el atacante ve a quién ha eliminado
+        : { t: 'killFx', x: r0(body.x), y: r0(body.y), mine: 0 });
     }
     this.checkWin();
   }
@@ -5335,10 +5338,13 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
   UI.hideEject = function () { $('eject').hidden = true; clearInterval(UI.ejT); };
 
   /* ---------- escena de eliminación (víctima) ---------- */
-  UI.showKill = function (G, byId, done) {
+  // asKiller: escena vista por el impostor que elimina (más corta, sin fantasma)
+  UI.showKill = function (G, byId, done, opts) {
+    opts = opts || {};
+    const asKiller = !!opts.asKiller;
     const box = $('kill-overlay'), cv = $('kill-canvas'), txt = box.querySelector('.kill-text');
-    const me = G.roster.get(G.myId) || { color: 'blanco' };
-    const killer = G.roster.get(byId) || { color: 'grafito' };
+    const me = asKiller ? { color: opts.victimColor || 'blanco' } : (G.roster.get(G.myId) || { color: 'blanco' });
+    const killer = asKiller ? (G.roster.get(G.me.look || G.myId) || { color: 'grafito' }) : (G.roster.get(byId) || { color: 'grafito' });
     const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Cuatro escenas originales; se elige una al azar en cada eliminación
     const STYLES = {
@@ -5348,8 +5354,10 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
       drain:  { stop: 96,  hit: 0.62, end: 1.4,  fall: 1.42 }  // drenaje de energía
     };
     const style = Object.keys(STYLES)[Math.floor(Math.random() * 4)], S = STYLES[style];
-    const D = reduce ? 2.4 : S.fall + 2.7;
-    $('kill-sub').textContent = G.team === 'crew'
+    const D = asKiller ? (reduce ? 1.6 : S.fall + 1.45) : (reduce ? 2.4 : S.fall + 2.7);
+    const title = asKiller ? 'OBJETIVO ELIMINADO' : 'SISTEMA DESCONECTADO';
+    $('kill-title').textContent = title; $('kill-title').dataset.text = title;
+    $('kill-sub').textContent = asKiller ? 'Que nadie te vea junto al cuerpo: aléjate o usa un conducto.' : G.team === 'crew'
       ? 'Ahora eres un fantasma: atraviesas paredes, puedes terminar tus tareas y hablar con otros fantasmas.'
       : 'Ahora eres un fantasma: puedes seguir saboteando y hablar con otros fantasmas.';
     box.hidden = false; box.style.opacity = ''; txt.className = 'kill-text';
@@ -5526,7 +5534,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
 
       // --- el fantasma se eleva ---
       const ghostAt = S.fall + 1.15;
-      if (t > ghostAt) {
+      if (!asKiller && t > ghostAt) {
         const g = clamp((t - ghostAt) / 1.3);
         c.save(); c.translate(vxx - 18 * k, gy - 10 * k - g * 70 * k); c.scale(k * 1.15, k * 1.15);
         R.drawUnit(c, 0, 0, me.color, { t, ghost: true, alpha: 0.7 * Math.min(1, g * 2), dir: -1, seed: 5 });
@@ -5550,7 +5558,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
       c.fillStyle = '#000'; c.fillRect(0, 0, w, bar); c.fillRect(0, h - bar, w, bar);
 
       if (t > S.fall + 0.3) txt.classList.add('on');
-      if (t > S.fall + 1.1) txt.classList.add('sub');
+      if (t > S.fall + (asKiller ? 0.55 : 1.1)) txt.classList.add('sub');
       if (t > D - 0.4) box.style.opacity = String(clamp((D - t) / 0.4));
       if (t < D) requestAnimationFrame(frame);
       else { box.hidden = true; box.style.opacity = ''; txt.className = 'kill-text'; done && done(); }
@@ -5798,7 +5806,20 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
     G.killAnimUntil = performance.now() + d * 1000;
     UI.setRole(G); UI.renderTasks(G);
   });
-  net.on('killFx', m => { R.burst(m.x, m.y, 'kill'); A.play('kill'); if (!m.mine) UI.flash(); });
+  net.on('killFx', m => {
+    R.burst(m.x, m.y, 'kill');
+    if (m.mine && killCamOn() && G.mode === 'playing') {
+      // Escena de eliminación vista por el impostor
+      if (TK.current) TK.close(true);
+      const d = UI.showKill(G, null, null, { asKiller: true, victimColor: m.vc });
+      G.killAnimUntil = performance.now() + d * 1000;
+      return;
+    }
+    A.play('kill'); if (!m.mine) UI.flash();
+  });
+  function killCamOn() { try { return localStorage.getItem('nx_killcam') !== '0'; } catch (e) { return true; } }
+  $('opt-killcam').checked = killCamOn();
+  $('opt-killcam').addEventListener('change', e => { try { localStorage.setItem('nx_killcam', e.target.checked ? '1' : '0'); } catch (err) {} });
   net.on('ventFx', m => { R.burst(m.x, m.y, 'vent'); A.play('vent'); });
   net.on('camsOk', () => openCams());
   net.on('camsOff', m => { closeCams(false); if (m.msg) UI.toast(m.msg, 'bad'); });

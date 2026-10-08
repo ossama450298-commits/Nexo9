@@ -43,7 +43,7 @@ Si eres **tripulante**, completa tus tareas y descubre a los impostores. Si eres
 - **3 sabotajes:** fallo eléctrico, caída de comunicaciones y emergencia energética.
 - **Reuniones** con megáfono para quien convoca, chat, votación y expulsión.
 - **Bots con deducción:** recuerdan dónde vio cada uno a quién, comprueban coartadas, desmienten mentiras y se acusan en el chat. Los impostores acechan, apagan las luces y se cubren entre ellos.
-- **4 escenas de eliminación** que salen al azar: descarga eléctrica, pulso EMP, llave inglesa y drenaje de energía.
+- **4 escenas de eliminación** que salen al azar: descarga eléctrica, pulso EMP, llave inglesa y drenaje de energía. Las ves tanto si te eliminan como si eliminas tú (como impostor; se puede desactivar en Configuración).
 - **Sonido y música** sintetizados en el navegador.
 
 ![Reunión](capturas/reunion.png)
