@@ -877,7 +877,7 @@ body.paused #hud, body.paused #game { filter: saturate(.55) brightness(.75); }
     <div id="actions" class="actions">
       <button class="act shift" id="act-shift">
         <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 4v6h-6l2.3-2.3A6 6 0 0 0 6 12"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 20v-6h6l-2.3 2.3A6 6 0 0 0 18 12"/></svg>
-        <b id="shift-label">Transformar</b><kbd>T</kbd><span class="cd"></span></button>
+        <b id="shift-label">Disfraz</b><kbd>T</kbd><span class="cd"></span></button>
       <button class="act hatch" id="act-hatch">
         <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M4 15h16M12 9v6"/><path d="M9 12l3 3 3-3"/></svg>
         <b>Trampilla</b><kbd>G</kbd><span class="cd"></span></button>
@@ -6434,7 +6434,7 @@ window.NX = { C: __req('constants'), MAP: __req('map') };
     if (G.role === 'shapeshifter') {
       const ab = G.ab || {};
       setAct('act-shift', G.me.alive && !G.me.vent && (G.me.look || !(ab.cd > 0)), G.me.look ? 0 : ab.cd);
-      $('shift-label').textContent = G.me.look ? `Volver · ${Math.ceil(ab.left || 0)}` : 'Transformar';
+      $('shift-label').textContent = G.me.look ? `Volver · ${Math.ceil(ab.left || 0)}` : 'Disfraz';
     }
     // Barra de tareas
     const tb = $('taskbar');
