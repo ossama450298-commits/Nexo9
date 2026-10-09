@@ -39,6 +39,7 @@ Si eres **tripulante**, completa tus tareas y descubre a los impostores. Si eres
 ## Qué incluye
 
 - **Estación original de 10 salas** con puertas automáticas, conductos, cámaras de seguridad e iluminación dinámica.
+- **Trampillas** en cada sala: impostores e ingenieros saltan a cualquier otra sala al instante, con una recarga configurable en el lobby (como la de eliminación). Quien esté cerca los verá.
 - **6 minijuegos de tareas** con tres niveles de dificultad.
 - **3 sabotajes:** fallo eléctrico, caída de comunicaciones y emergencia energética.
 - **Reuniones** con megáfono para quien convoca, chat, votación y expulsión.
@@ -61,6 +62,7 @@ Si eres **tripulante**, completa tus tareas y descubre a los impostores. Si eres
 | F | Sabotear (impostor) |
 | V | Conducto (impostor e ingeniero) |
 | T | Transformarse (cambiaformas) |
+| G | Trampilla: viajar a cualquier sala (impostor e ingeniero) |
 | M · Tab | Mapa · Lista de tareas |
 | Esc | Cierra ventanas o abre el **menú de pausa** (reanudar, audio, opciones, controles y salir). Contra bots, la partida se detiene. |
 
