@@ -60,7 +60,7 @@ Si eres **tripulante**, completa tus tareas y descubre a los impostores. Si eres
 | R | Reportar cuerpo |
 | Q | Eliminar (impostor) |
 | F | Sabotear (impostor) |
-| V | Conducto (impostor e ingeniero) |
+| V | Entrar o salir de un conducto (impostor e ingeniero). Dentro, muévete con las flechas/WASD hacia la salida que quieras, con los números o con un clic |
 | T | Transformarse (cambiaformas) |
 | G | Trampilla: viajar a cualquier sala (impostor e ingeniero) |
 | M · Tab | Mapa · Lista de tareas |
